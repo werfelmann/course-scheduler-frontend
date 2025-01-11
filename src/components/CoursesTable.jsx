@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 function CoursesTable() {
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
     useEffect(() => {
         fetch('http://localhost:8080/api/courses')
@@ -24,6 +25,36 @@ function CoursesTable() {
         });
     }, []);
 
+    const sortedCourses = useMemo(() => {
+        const sortableCourses = [...courses];
+        if (sortConfig.key) {
+            sortableCourses.sort((a, b) => {
+                const aVal = a[sortConfig.key]?.toString().toLowerCase() || '';
+                const bVal = b[sortConfig.key]?.toString().toLowerCase() || '';
+
+                if (aVal < bVal) {
+                    return sortConfig.direction === 'asc' ? -1 : 1;
+                }
+
+                if (aVal > bVal) {
+                    return sortConfig.direction === 'asc' ? 1 : -1;
+                }
+                
+                return 0;
+            });
+        }
+        return sortableCourses;
+    }, [courses, sortConfig]);
+
+    const requestSort = (key) => {
+        let direction = 'asc';
+
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
@@ -32,14 +63,29 @@ function CoursesTable() {
             <table className="table table-striped mx-auto">
                 <thead>
                     <tr>
-                        <th>Course Number</th>
-                        <th>Course Title</th>
-                        <th>Credit Hours</th>
-                        <th>Typical Rotation</th>
+                        <th>
+                            <button type="button" onClick={() => requestSort('fullCourseNumber')} className="btn btn-light">
+                                Course Number
+                            </button>
+                        </th>
+                        <th>
+                            <button type="button" onClick={() => requestSort('name')} className="btn btn-light">
+                                Course Title
+                            </button>
+                        </th>
+                        <th>
+                            <button type="button" onClick={() => requestSort('creditHours')} className="btn btn-light">
+                                Credit Hours
+                            </button></th>
+                        <th>
+                            <button type="button" onClick={() => requestSort('typicalRotation')} className="btn btn-light">
+                                Typical Rotation
+                            </button>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    {courses.map((course) => (
+                    {sortedCourses.map((course) => (
                         <tr key={course.id}>
                             <td>{course.fullCourseNumber}</td>
                             <td>{course.name}</td>
