@@ -4,7 +4,7 @@ function CoursesTable() {
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+    const [sortConfig, setSortConfig] = useState({ key: 'fullCourseNumber', direction: 'asc' });
 
     useEffect(() => {
         fetch('http://localhost:8080/api/courses')

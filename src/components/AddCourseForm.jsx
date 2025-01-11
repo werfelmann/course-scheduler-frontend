@@ -1,13 +1,34 @@
 import { useState } from "react";
 
+const rotationOptions = [
+    { label: 'Fall', value: 'FA' }, 
+    { label: 'Spring', value: 'SP' }, 
+    { label: 'Fall 1', value: 'FA1' }, 
+    { label: 'Fall 2', value: 'FA2' }, 
+    { label: 'Spring 1', value: 'SP1' }, 
+    { label: 'Spring 2', value: 'SP2' }, 
+    { label: 'Summer', value: 'SU' }, 
+];
+
 function AddCourseForm() {
     const [courseNumber, setCourseNumber] = useState('');
     const [name, setName] = useState('');
     const [creditHours, setCreditHours] = useState(0);
-    const [typicalRotation, setTypicalRotation] = useState(['']);
+    const [typicalRotation, setTypicalRotation] = useState([]);
+
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
 
+    const handleCheckboxChange = (e) => {
+        const { value, checked } = e.target;
+
+        if (checked) {
+            setTypicalRotation((prev) => [...prev, value]);
+        } else {
+            setTypicalRotation((prev) => prev.filter((option) => option !== value));
+        }
+    };
+    
     const handleSubmit = async (event) => {
         event.preventDefault();
         setError(null);
@@ -40,7 +61,7 @@ function AddCourseForm() {
             setCourseNumber('');
             setName('');
             setCreditHours(0);
-            setTypicalRotation(['']);
+            setTypicalRotation([]);
         } catch (err) {
             console.log(err);
             setError(err.message || 'Something went wrong');
@@ -88,18 +109,22 @@ function AddCourseForm() {
                 </div>
 
                 <div className="mb-3">
-                    <label htmlFor="typicalRotation" className="form-label">Typical Rotation</label>
-                    <input 
-                        type="text"
-                        id="typicalRotation"
-                        className="form-control"
-                        value={typicalRotation}
-                        onChange={(e) => setTypicalRotation(e.target.value.split(',').map(item => item.trim()))}
-                        placeholder='e.g., FA, SP, FA1, etc.' 
-                    />
-                    <small className="text-muted">
-                        Enter one or more rotations separated by commas. Example: "FA, SP"
-                    </small>
+                    <label className="form-label">Typical Rotation</label>
+                        <div>
+                            {rotationOptions.map((option) => (
+                                <div key={option.value} className="form-check form-check-inline">
+                                    <input 
+                                        type="checkbox"
+                                        id={option.value}
+                                        className="form-check-input"
+                                        value={option.value}
+                                        checked={typicalRotation.includes(option.value)}
+                                        onChange={handleCheckboxChange}
+                                    />
+                                    <label htmlFor={option.value} className="form-check-label">{option.label}</label>
+                                </div>
+                            ))}
+                        </div>
                 </div>
 
                 <button type="submit" className="btn btn-dark">Add Course</button>
