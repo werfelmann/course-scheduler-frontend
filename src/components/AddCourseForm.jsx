@@ -21,6 +21,13 @@ function AddCourseForm() {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
+  const handleCourseNumberChange = (e) => {
+    const value = e.target.value;
+    if (/^\d{0,4}$/.test(value)) {
+      setCourseNumber(value);
+    }
+  };
+
   const handleCheckboxChange = (e) => {
     const { value, checked } = e.target;
 
@@ -57,6 +64,11 @@ function AddCourseForm() {
     event.preventDefault();
     setError(null);
     setSuccessMessage(null);
+
+    if (courseNumber.length !== 4) {
+      setError("Course number must be a 4 digit number.");
+      return;
+    }
 
     const newCourse = {
       courseNumber,
@@ -108,7 +120,7 @@ function AddCourseForm() {
             id="courseNumber"
             className="form-control"
             value={courseNumber}
-            onChange={(e) => setCourseNumber(e.target.value)}
+            onChange={handleCourseNumberChange}
             required
           />
         </div>
@@ -153,7 +165,7 @@ function AddCourseForm() {
               <input
                 type="number"
                 className="form-control"
-                vulue={minCreditHours}
+                value={minCreditHours}
                 onChange={handleMinCreditChange}
                 required
                 placeholder="Min"
@@ -162,7 +174,7 @@ function AddCourseForm() {
               <input
                 type="number"
                 className="form-control"
-                vulue={maxCreditHours}
+                value={maxCreditHours}
                 onChange={handleMaxCreditChange}
                 required
                 placeholder="Max"

@@ -8,6 +8,8 @@ function CoursesTable() {
     key: "fullCourseNumber",
     direction: "asc",
   });
+  const [showModal, setShowModal] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState(null);
 
   useEffect(() => {
     fetch("http://localhost:8080/api/courses")
@@ -28,6 +30,36 @@ function CoursesTable() {
         setLoading(false);
       });
   }, []);
+
+  const handleDeleteClick = (courseId) => {
+    setCourseToDelete(courseId);
+    setShowModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!courseToDelete) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/courses/${courseToDelete}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete course.");
+      }
+
+      setCourses((prevCourses) =>
+        prevCourses.filter((course) => course.id !== courseToDelete)
+      );
+      setShowModal(false);
+      setCourseToDelete(null);
+    } catch (err) {
+      setError("Error deleting course.", err);
+    }
+  };
 
   const sortedCourses = useMemo(() => {
     const sortableCourses = [...courses];
@@ -102,6 +134,7 @@ function CoursesTable() {
                 Typical Rotation
               </button>
             </th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -110,7 +143,7 @@ function CoursesTable() {
               <td>{course.fullCourseNumber}</td>
               <td>{course.name}</td>
               <td>
-                {course.minCreditHours && course.maxCreditHours
+                {course.minCreditHours < course.maxCreditHours
                   ? `${course.minCreditHours}-${course.maxCreditHours}`
                   : course.minCreditHours}
               </td>
@@ -119,10 +152,49 @@ function CoursesTable() {
                   ? course.typicalRotation.join(", ")
                   : "As Needed"}
               </td>
+              <td>
+                <button
+                  className="btn btn-sm"
+                  onClick={() => handleDeleteClick(course.id)}
+                >
+                  🗑️
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {showModal && (
+        <div className="modal fade show d-block" tabIndex="-1" role="dialog">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Confirm</h5>
+              </div>
+              <div className="modal-body">
+                <p>Are you sure you want to delete this course?</p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={confirmDelete}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
