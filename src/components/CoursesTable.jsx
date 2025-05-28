@@ -131,7 +131,7 @@ function CoursesTable() {
                 onClick={() => requestSort("typicalRotation")}
                 className="btn btn-light"
               >
-                Typical Rotation
+                Rotation
               </button>
             </th>
             <th></th>
