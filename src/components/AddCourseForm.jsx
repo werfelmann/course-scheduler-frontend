@@ -17,6 +17,8 @@ function AddCourseForm() {
   const [minCreditHours, setMinCreditHours] = useState(3);
   const [maxCreditHours, setMaxCreditHours] = useState(3);
   const [typicalRotation, setTypicalRotation] = useState([]);
+  const [description, setDescription] = useState("");
+  const [notes, setNotes] = useState("");
 
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
@@ -76,6 +78,8 @@ function AddCourseForm() {
       minCreditHours,
       maxCreditHours,
       typicalRotation,
+      description,
+      notes,
     };
 
     try {
@@ -101,6 +105,8 @@ function AddCourseForm() {
       setMaxCreditHours(3);
       setTypicalRotation([]);
       setIsVariableCredit(false);
+      setDescription("");
+      setNotes("");
     } catch (err) {
       console.log(err);
       setError(err.message || "Something went wrong");
@@ -136,6 +142,19 @@ function AddCourseForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+          />
+        </div>
+
+        <div className="mb-3">
+          <label htmlFor="description" className="form-label">
+            Course Description
+          </label>
+          <textarea
+            rows={4}
+            id="description"
+            className="form-control"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           />
         </div>
 
@@ -202,6 +221,19 @@ function AddCourseForm() {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="mb-3">
+          <label htmlFor="notes" className="form-label">
+            Notes
+          </label>
+          <textarea
+            rows={4}
+            id="notes"
+            className="form-control"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
         </div>
 
         <button type="submit" className="btn btn-dark">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const rotationOptions = [
   { label: "Fall", value: "FA" },
@@ -16,6 +16,8 @@ function CourseDetails() {
   const [course, setCourse] = useState(null);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -42,6 +44,24 @@ function CourseDetails() {
       ? course.typicalRotation.filter((r) => r !== value)
       : [...course.typicalRotation, value];
     handleChange("typicalRotation", updated);
+  };
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await fetch(`http://localhost:8080/api/courses/${courseId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!res.ok) throw new Error("Deletion failed");
+      setSuccess("Course has been deleted.");
+      setCourse(null);
+      navigate("/courses");
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -122,7 +142,6 @@ function CourseDetails() {
           </div>
         </div>
 
-        {/* Description and Notes - Assuming editable strings */}
         <div className="mb-3">
           <label className="form-label">Description</label>
           <textarea
@@ -143,9 +162,16 @@ function CourseDetails() {
           />
         </div>
 
-        <button type="submit" className="btn btn-dark">
-          Save Changes
-        </button>
+        <div className="container-fluid">
+          <div className="row justify-content-between">
+            <button onClick={handleDelete} className="btn btn-danger col-4">
+              Delete Course
+            </button>
+            <button type="submit" className="btn btn-dark col-4">
+              Save Changes
+            </button>
+          </div>
+        </div>
       </form>
 
       {error && <div className="alert alert-danger mt-3">{error}</div>}
