@@ -1,16 +1,19 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import "./App.css";
 import CoursesTable from "./components/CoursesTable";
 import AddCourseForm from "./components/AddCourseForm";
 import Navbar from "./components/Navbar";
+import CourseDetails from "./components/CourseDetails";
 
 function App() {
   return (
     <div>
       <Navbar />
-      <h1>Course Scheduler</h1>
-      <CoursesTable />
-      <AddCourseForm />
+      <Routes>
+        <Route path="/courses" element={<CoursesTable />} />
+        <Route path="/add-course" element={<AddCourseForm />} />
+        <Route path="/courses/:courseId" element={<CourseDetails />} />
+      </Routes>
     </div>
   );
 }
